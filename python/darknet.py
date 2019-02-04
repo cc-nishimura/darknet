@@ -1,4 +1,4 @@
-#!python3
+#!/usr/bin/env python3
 """
 Python 3 wrapper for identifying objects in images
 
@@ -77,11 +77,11 @@ class METADATA(Structure):
 #lib = CDLL("/home/pjreddie/documents/darknet/libdarknet.so", RTLD_GLOBAL)
 #lib = CDLL("libdarknet.so", RTLD_GLOBAL)
 hasGPU = True
+darknet_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if os.name == "nt":
-    cwd = os.path.dirname(__file__)
-    os.environ['PATH'] = cwd + ';' + os.environ['PATH']
-    winGPUdll = os.path.join(cwd, "yolo_cpp_dll.dll")
-    winNoGPUdll = os.path.join(cwd, "yolo_cpp_dll_nogpu.dll")
+    os.environ['PATH'] = darknet_root + ';' + os.environ['PATH']
+    winGPUdll = os.path.join(darknet_root, "yolo_cpp_dll.dll")
+    winNoGPUdll = os.path.join(darknet_root, "yolo_cpp_dll_nogpu.dll")
     envKeys = list()
     for k, v in os.environ.items():
         envKeys.append(k)
@@ -119,7 +119,7 @@ if os.name == "nt":
             lib = CDLL(winGPUdll, RTLD_GLOBAL)
             print("Environment variables indicated a CPU run, but we didn't find `"+winNoGPUdll+"`. Trying a GPU run anyway.")
 else:
-    lib = CDLL("./libdarknet.so", RTLD_GLOBAL)
+    lib = CDLL(os.path.join(darknet_root, "libdarknet.so"), RTLD_GLOBAL)
 lib.network_width.argtypes = [c_void_p]
 lib.network_width.restype = c_int
 lib.network_height.argtypes = [c_void_p]
@@ -164,6 +164,9 @@ load_net.restype = c_void_p
 load_net_custom = lib.load_network_custom
 load_net_custom.argtypes = [c_char_p, c_char_p, c_int, c_int]
 load_net_custom.restype = c_void_p
+
+free_net = lib.free_network
+free_net.argtypes = [c_void_p]
 
 do_nms_obj = lib.do_nms_obj
 do_nms_obj.argtypes = [POINTER(DETECTION), c_int, c_int, c_float]
@@ -422,4 +425,5 @@ def performDetect(imagePath="data/dog.jpg", thresh= 0.25, configPath = "./cfg/yo
     return detections
 
 if __name__ == "__main__":
+    os.chdir(darknet_root)
     print(performDetect())

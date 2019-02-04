@@ -178,7 +178,7 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
     cvDestroyAllWindows();
 #endif
 
-    free_network(net);
+    free_network(&net);
     free_ptrs((void**)labels, classes);
     free_ptrs((void**)paths, plist->size);
     free_list(plist);
@@ -289,7 +289,7 @@ char buff[256];
 sprintf(buff, "%s/%s.weights", backup_directory, base);
 save_weights(net, buff);
 
-free_network(net);
+free_network(&net);
 free_ptrs((void**)labels, classes);
 free_ptrs((void**)paths, plist->size);
 free_list(plist);

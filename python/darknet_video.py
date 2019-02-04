@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from ctypes import *
 import math
 import random
@@ -53,8 +54,8 @@ class METADATA(Structure):
 
 
 hasGPU = True
-
-lib = CDLL("./libdarknet.so", RTLD_GLOBAL)
+darknet_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+lib = CDLL(os.path.join(darknet_root, "libdarknet.so"), RTLD_GLOBAL)
 lib.network_width.argtypes = [c_void_p]
 lib.network_width.restype = c_int
 lib.network_height.argtypes = [c_void_p]
@@ -101,6 +102,9 @@ load_net.restype = c_void_p
 load_net_custom = lib.load_network_custom
 load_net_custom.argtypes = [c_char_p, c_char_p, c_int, c_int]
 load_net_custom.restype = c_void_p
+
+free_net = lib.free_network
+free_net.argtypes = [c_void_p]
 
 do_nms_obj = lib.do_nms_obj
 do_nms_obj.argtypes = [POINTER(DETECTION), c_int, c_int, c_float]
@@ -242,7 +246,7 @@ def cvDrawBoxes(detections, img):
         pt2 = (xmax, ymax)
         cv2.rectangle(img, pt1, pt2, (0, 255, 0), 2)
         cv2.putText(img,
-                    detection[0].decode() +
+                    detection[0] +
                     " [" + str(round(detection[1] * 100, 2)) + "]",
                     (pt1[0], pt1[1] + 20), cv2.FONT_HERSHEY_SIMPLEX, 1,
                     [0, 255, 0], 4)
@@ -304,6 +308,8 @@ def YOLO():
     while True:
         prev_time = time.time()
         ret, frame_read = cap.read()
+        if not ret:
+            break
         frame_rgb = cv2.cvtColor(frame_read, cv2.COLOR_BGR2RGB)
         frame_resized = cv2.resize(frame_rgb,
                                    (lib.network_width(netMain),
@@ -312,9 +318,11 @@ def YOLO():
         detections = detect(netMain, metaMain, frame_resized, thresh=0.25)
         image = cvDrawBoxes(detections, frame_resized)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        out.write(image)
         print(1/(time.time()-prev_time))
     cap.release()
     out.release()
 
 if __name__ == "__main__":
+    os.chdir(darknet_root)
     YOLO()
