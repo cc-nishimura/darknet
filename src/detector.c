@@ -245,7 +245,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     free_list(options);
 
     free(nets);
-    free_network(net);
+    free_network(&net);
 }
 
 
@@ -1221,7 +1221,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
     }
     free(alphabet);
 
-    free_network(net);
+    free_network(&net);
 }
 
 void run_detector(int argc, char **argv)

@@ -349,7 +349,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     }
     free(alphabet);
 
-    free_network(net);
+    free_network(&net);
 }
 #else
 void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int cam_index, const char *filename, char **names, int classes,
