@@ -94,6 +94,8 @@ def YOLO():
     while True:
         prev_time = time.time()
         ret, frame_read = cap.read()
+        if not ret:
+            break
         frame_rgb = cv2.cvtColor(frame_read, cv2.COLOR_BGR2RGB)
         frame_resized = cv2.resize(frame_rgb,
                                    (darknet.network_width(netMain),
@@ -106,6 +108,7 @@ def YOLO():
         image = cvDrawBoxes(detections, frame_resized)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         print(1/(time.time()-prev_time))
+        out.write(image)
         cv2.imshow('Demo', image)
         cv2.waitKey(3)
     cap.release()

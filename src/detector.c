@@ -337,13 +337,13 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     free_list_contents_kvp(options);
     free_list(options);
 
-    for (i = 0; i < ngpus; ++i) free_network(nets[i]);
+    for (i = 0; i < ngpus; ++i) free_network(&nets[i]);
     free(nets);
-    //free_network(net);
+    //free_network(&net);
 
     if (calc_map) {
         net_map.n = 0;
-        free_network(net_map);
+        free_network(&net_map);
     }
 }
 
@@ -1090,7 +1090,7 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
         //randomize_network_recurrent_state(*existing_net);
     }
     else {
-        free_network(net);
+        free_network(&net);
     }
 
     return mean_average_precision;
@@ -1411,7 +1411,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
     }
     free(alphabet);
 
-    free_network(net);
+    free_network(&net);
 }
 
 void run_detector(int argc, char **argv)
